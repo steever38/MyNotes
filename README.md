@@ -35,10 +35,7 @@ La première page est une page de connexion. L’utilisateur doit :
 ## Sécurité
 
 - **Hachage des mots de passe :**
-  - Les mots de passe sont hachés de manière sécurisée en utilisant l'algorithme SHA-256 via la bibliothèque standard de Python :
-  - ```python
-  hashed_password = hashlib.sha256(password.encode()).hexdigest()
-  ```
+  - Les mots de passe sont hachés de manière sécurisée en utilisant l'algorithme SHA-256 via la bibliothèque standard de Python
 
 - **Limitation du nombre d'appels à l'API de connexion :**
   - **Plus de 10 requêtes par minute** depuis une même adresse IP entraîne un **bannissement temporaire de 1 minute** pour l'accès à l'API de connexion.
@@ -57,7 +54,7 @@ La première page est une page de connexion. L’utilisateur doit :
 ## Base de données
 Le projet repose sur une base de données relationnelle **SQLite**. Voici le schéma de l'architecture des données :
 <p align="center">
-  <img src="https://i.imgur.com/wiG8vzj.png" alt="Description de l'image" width="500">
+  <img src="https://i.imgur.com/wiG8vzj.png" alt="Description de l'image" width="700">
 </p>
 
 
