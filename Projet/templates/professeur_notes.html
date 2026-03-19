@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professeur {{ prenom_utilisateur }} {{ nom_utilisateur }}</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='CSS/style-professeur-notes.css') }}">
+    <style>
+    </style>
+</head>
+<body>
+    <header>
+      <form action="/professeur" method="GET" style="position: absolute; left: 20px;">
+        <button type="submit" id="retour-professeur">
+            <img src="{{ url_for('static', filename='images/back.svg') }}" alt="Retour" style="width: 20px; height: 20px; margin-right: 10px;">
+            Retour
+        </button>
+      </form>
+      <h1>Notes de votre classe : {{ classe }} ({{ people_number }} élèves)</h1>
+      <form action="/deconnexion" method="POST">
+          <button type="submit" id="deconnexion">
+              <img src="{{ url_for('static', filename='images/logout.svg') }}" alt="image" style="width: 20px; height: 20px; margin-right: 10px;">
+              Deconnexion
+          </button>
+      </form>
+    </header>
+    <form id="update-notes-form" action="/update_notes" method="POST">
+        {% for composite_key, data in notes.items() %}
+        <div class="note-group {{ data.nom_note|lower|replace(' ', '-') }} {% if loop.last %}last-note{% endif %}">
+            <h2>
+                <strong>{{ data.nom_note }}</strong>
+
+                <span class="moyenne">(Moyenne: {{ data.moyenne }})</span>
+                
+                <a href="{{ url_for('supprimer_note', composite_key=composite_key, classe=classe) }}"
+                class="delete-btn"
+                onclick="return confirm('Voulez-vous vraiment supprimer la note {{ data.nom_note }} ?');">
+                <img src="{{ url_for('static', filename='images/bin.svg') }}" alt="Supprimer" style="width:20px;height:20px;">
+                </a>
+              </h2>
+          <div>
+            <div class="details">
+              📅 {{ data.date }}
+            </div>
+            <div class="details">
+              ⚖️ Coef. {{ data.coefficient }}
+            </div>
+          </div>
+          <div class="notes">
+            {% if data.eleves %}
+              {% for eleve_nom, details in data.eleves.items() %}
+                <div class="note">
+                  <strong>{{ eleve_nom }}</strong>
+                  <div class="note-container">
+                    <input type="number" 
+                           id="note-{{ composite_key|replace('||', '_') }}-{{ details.id_utilisateur }}"
+                           name="notes[{{ composite_key }}][eleves][{{ details.id_utilisateur }}]"
+                           class="note-input"
+                           value="{{ details.note }}"
+                           min="0" 
+                           max="20"
+                           step="0.01">
+                  </div>
+                </div>
+              {% endfor %}
+            {% else %}
+              <div class="note">
+                <div>Pas de notes disponibles pour cette évaluation</div>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+      <div class="button-container">
+        <input type="hidden" name="classe" value="{{ classe }}">
+        <button type="submit" id="save-changes" class="save-button" style="display: none;">
+          <img src="{{ url_for('static', filename='images/save.svg') }}" alt="Save" style="width: 20px; height: 20px; margin-right: 10px;">
+          Enregistrer les modifications
+        </button>
+        <a href="{{ url_for('nouvelle_note', classe=classe) }}" class="new-note-link">
+          <button type="button" id="new-note">
+            <img src="{{ url_for('static', filename='images/new.svg') }}" alt="Créer" style="width: 20px; height: 20px; margin-right: 10px;">
+            Créer une nouvelle évaluation
+          </button>
+        </a>
+        <button id="export-csv-teacher" class="btn-export">
+          <img src="{{ url_for('static', filename='images/csv.svg') }}" alt="CSV" style="width: 20px; height: 20px; margin-right: 10px;">
+          Exporter les notes (CSV)
+        </button>
+      </div>
+    </form>
+    
+
+    
+
+    <script>
+        let hasChanges = false;
+    
+        // Récupération du bouton "Enregistrer les modifications"
+        const saveButton = document.getElementById('save-changes');
+    
+        // Ajout d'un écouteur sur chaque champ de note
+        document.querySelectorAll('.note-input').forEach(input => {
+            // Sélection automatique du texte au focus
+            input.addEventListener('focus', function () {
+                this.select();
+            });
+    
+            // Suivi des modifications
+            input.addEventListener('input', function () {
+                let originalValue = parseFloat(this.defaultValue);
+                let newValue = parseFloat(this.value);
+    
+                // Si la valeur change, active le bouton "Enregistrer les modifications"
+                if (newValue !== originalValue) {
+                    hasChanges = true;
+                    saveButton.style.display = 'flex';
+                }
+            });
+    
+            // Validation de la note
+            input.addEventListener('blur', function () {
+                let value = parseFloat(this.value);
+    
+                // Limitation de la note entre 0 et 20
+                if (value < 0) this.value = 0;
+                if (value > 20) this.value = 20;
+
+                // Forcer le format avec un point
+                this.value = parseFloat(this.value).toFixed(2).replace(',', '.');
+            });
+        });
+    
+        // Désactivation du bouton si le formulaire est soumis
+        document.getElementById('update-notes-form').addEventListener('submit', function () {
+            hasChanges = false;
+            saveButton.style.display = 'none';
+        });
+
+        // Ajout des écouteurs pour les champs éditables (nom, date, coef)
+        document.querySelectorAll('.note-name-input, .note-date-input, .note-coef-input').forEach(input => {
+            input.addEventListener('input', function () {
+                hasChanges = true;
+                saveButton.style.display = 'block';
+            });
+        });
+
+    </script>
+
+    <script>
+      // Récupération des données des notes depuis le contexte du template
+      const teacherNotes = JSON.parse('{{ notes|tojson|safe }}');
+    
+      // Fonction d'échappement pour les champs CSV (gère les virgules, guillemets, retours à la ligne, etc.)
+      function escapeCSV(field) {
+          if (typeof field === 'string' && /[",\n;]/.test(field)) {
+              return '"' + field.replace(/"/g, '""') + '"';
+          }
+          return field;
+      }
+    
+      document.getElementById("export-csv-teacher").addEventListener("click", function () {
+          // Initialisation du contenu CSV avec BOM UTF-8 pour une bonne gestion des accents
+          let csvContent = "\uFEFF";
+          // Entête CSV avec les colonnes souhaitées
+          csvContent += "Eleve;note;Nom de la note;Date;Coefficient;Moyenne classe\n";
+      
+          // Parcours de chaque évaluation dans l'objet 'teacherNotes'
+          for (const compositeKey in teacherNotes) {
+              const evaluation = teacherNotes[compositeKey];
+              // Pour chaque élève concerné par cette évaluation (si des notes existent)
+              if(evaluation.eleves) {
+                  for (const eleve in evaluation.eleves) {
+                      const noteDetails = evaluation.eleves[eleve];
+                      // Création d'une ligne CSV pour chaque élève
+                      const row = [
+                          escapeCSV(eleve),
+                          noteDetails.note.toString().replace('.', ','), // format français (virgule comme séparateur décimal)
+                          escapeCSV(evaluation.nom_note),
+                          escapeCSV(evaluation.date),
+                          evaluation.coefficient,
+                          evaluation.moyenne.toString().replace('.', ',')
+                      ];
+                      csvContent += row.join(';') + "\n";
+                  }
+              }
+          }
+        
+          // Création du fichier blob et déclenchement du téléchargement
+          const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          // Le nom du fichier est le nom de la classe, fourni par la variable du template
+          a.download = "{{ classe }}.csv";
+          a.style.display = "none";
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+      });
+    </script>
+</body>
+</html>

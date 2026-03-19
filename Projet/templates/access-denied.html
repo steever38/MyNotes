@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accès non autorisé</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='CSS/style-acces.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="icon">
+            <img src="{{ url_for('static', filename='images/cross.svg') }}" alt="Access Denied Icon">
+        </div>
+        <h1>Accès Refusé</h1>
+        <p>Vous n'avez pas la permission de voir cette page.</p>
+        <p>Veuillez vérifier vos informations d'identification et réessayer.</p>
+        <p class="error-code">Error Code: 403</p>
+    </div>
+</body>
+</html>

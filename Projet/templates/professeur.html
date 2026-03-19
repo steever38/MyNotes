@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professeur {{ prenom_utilisateur }} {{ nom_utilisateur }}</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='CSS/style-professeur.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Vos Classes</h1>
+        <form action="/deconnexion" method="POST">
+            <button type="submit" id="deconnexion">
+                <img src="{{ url_for('static', filename='images/logout.svg') }}" alt="image" style="width: 20px; height: 20px; margin-right: 10px;">
+                Deconnexion
+            </button>
+        </form>
+    </header>
+    <div class="btn-container">
+        {% for classe in classes %}
+        <form action="/professeur/notes" method="GET" style="display: inline;">
+            <input type="hidden" name="classe" value="{{ classe }}">
+            <button class="btn-classe" type="submit">{{ classe }}</button>
+        </form>
+        {% endfor %}
+    </div>
+</body>
+</html>

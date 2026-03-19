@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notes de {{ prenom_utilisateur }} {{ nom_utilisateur }}</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='CSS/style-eleve.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Vos Notes</h1>
+        <form action="/deconnexion" method="POST">
+            <button type="submit" id="deconnexion">
+                <img src="{{ url_for('static', filename='images/logout.svg') }}" alt="image" style="width: 20px; height: 20px; margin-right: 10px;">
+                Deconnexion
+            </button>
+        </form>
+    </header>
+    {% for matiere, data in matieres.items() %}
+    <div class="matiere {{ matiere.lower().replace(' ', '-') }} {% if loop.last %}last-matiere{% endif %}">
+        <h2>
+            <img src="{{ url_for('static', filename='images/' + matiere.replace(' ', '-') + '.svg') }}" width="22px" alt="{{ matiere }}">
+            {{ matiere }}
+        </h2>
+        <div class="notes">
+            {% if data.notes %}
+                {% for note in data.notes %}
+                <div class="note">
+                    <div>
+                        <strong>{{ note.nom }}</strong>
+                        <div class="details">
+                            📅 {{ note.date }}
+                        </div>
+                        <div class="details">
+                            📊 Moyenne : {{ '%.2f'|format(note.moyenne_classe) }} ⚖️ Coef. {{ note.coefficient }}
+                        </div>
+                    </div>
+                    <div class="note-valeur">{{ '%.2f'|format(note.valeur) }}</div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="note">
+                    <div>Pas de notes disponibles pour cette matière</div>
+                </div>
+            {% endif %}
+        </div>
+        <div class="moyenne-matiere">Moyenne matière : {{ '%.2f'|format(data.moyenne) }}</div>
+    </div>
+    {% endfor %}
+
+    <div class="general-info">
+        <div>
+            Moyenne générale : <strong>{{ '%.2f'|format(moyenne_generale) }}</strong> |
+            Moyenne classe générale : <strong>{{ '%.2f'|format(moyenne_classe_generale) }}</strong>
+        </div>
+        <button id="export-csv" class="btn-export">
+            <img src="{{ url_for('static', filename='images/csv.svg') }}" alt="image" style="width: 20px; height: 20px; margin-right: 10px;">
+            Exporter les notes (CSV)</button>
+    </div>
+
+    <script>
+        document.getElementById("export-csv").addEventListener("click", function () {
+        // Récupérer les données des notes
+        const matiereData = JSON.parse('{{ matieres|tojson|safe }}');
+            
+        // Fonction pour échapper les champs CSV
+        function escapeCSV(field) {
+            // Si le champ contient des virgules, des guillemets ou des retours à la ligne
+            if (/[",\n]/.test(field)) {
+                // Échapper les guillemets en les doublant et entourer le champ de guillemets
+                return '"' + field.replace(/"/g, '""') + '"';
+            }
+            return field;
+        }
+
+        // Créer l'en-tête du CSV
+        let csvContent = "\uFEFF"; // BOM pour l'encodage UTF-8
+        csvContent += "Matiere;Nom de la note;Date;Note;Coefficient;Moyenne classe\n";
+
+        // Ajouter les données
+        for (const matiere in matiereData) {
+            const notes = matiereData[matiere].notes;
+            notes.forEach(note => {
+                // Échapper et formater chaque champ
+                const row = [
+                    escapeCSV(matiere),
+                    escapeCSV(note.nom),
+                    escapeCSV(note.date),
+                    note.valeur.toString().replace('.', ','), // Format français pour les nombres
+                    note.coefficient,
+                    note.moyenne_classe.toString().replace('.', ',')
+                ];
+                // Joindre les champs avec des points-virgules
+                csvContent += row.join(';') + '\n';
+            });
+        }
+
+        // Créer et télécharger le fichier
+        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "notes.csv";
+        a.style.display = "none";
+
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    });
+    </script>    
+</body>
+</html>

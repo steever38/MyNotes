@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block content1 %}
+
+<div class="logo-container">
+    <img id="logo" src="{{ url_for('static', filename='images/pas-pronote.png') }}" alt="LOGO">
+</div>
+
+<div class="login-box">
+    <h2>Connexion</h2>
+    <form method="POST" action="/login">
+        <div class="user-box">
+            <input type="text" name="user" required="">
+            <label>Identifiant</label>
+        </div>
+        <div class="user-box">
+            <input type="password" name="password" required="" id="password-input">
+            <img src="{{ url_for('static', filename='images/eye-off.svg') }}" width="20px" class="eye-icon" id="eye-icon">
+            <label for="password-input">Mot de passe</label>
+        </div>
+        <div class="button-container">
+            <button id="login-button" type="submit" class="btn-connecter">Se connecter</button>
+        </div>
+    </form>
+    {% if erreur %}
+    <p id="connexion-error">{{ erreur }}</p>
+    {% endif %}
+
+    <script>
+        let eyeicon = document.getElementById("eye-icon");
+        let password = document.getElementById("password-input");
+        
+        eyeicon.onclick = function(){
+            if(password.type == "password"){
+                password.type = "text";
+                eyeicon.src = "{{ url_for('static', filename='images/eye.svg') }}"
+            } else{
+                password.type = "password";
+                eyeicon.src = "{{ url_for('static', filename='images/eye-off.svg') }}"
+            }
+        }
+    </script>
+</div>
+
+
+{% endblock %}
