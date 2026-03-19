@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 # Installation
 
@@ -101,3 +102,6 @@ Si l’utilisateur est un **professeur**, il est redirigé vers une page qui con
 # Page d’Erreur
 
 - **Si l’utilisateur modifie l’URL** pour changer son rôle, il est redirigé vers une page d’erreur indiquant qu’il **n’a pas la permission d’accéder à cette page**.
+=======
+# MyNotes
+>>>>>>> 9ec47fd55ae419cfcde5c5fbea49c45197a1e9ea
