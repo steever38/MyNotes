@@ -1,7 +1,11 @@
-<<<<<<< HEAD
+<p align="center">
+  <img src="https://i.imgur.com/8DOaNe5.png" alt="Description de l'image" width="700">
+</p>
 
-# Installation
+Ce projet est une application web en Python / Flask pour la gestion des notes des élèves et des professeurs.
+Elle inclut des fonctionnalités de sécurité et des pages adaptées aux différents rôles (élève, professeur).
 
+## Installation
 
 - Pour installer les dépendances du projet, exécutez la commande suivante :
 ```bash
@@ -11,11 +15,11 @@ pip install -r requirements.txt
 ```bash
 python3 run.py
 ```
-# Liste des utilisateurs
+## Liste des utilisateurs
 Le fichier `users.xls` contient la liste complète des utilisateurs ainsi que leurs mots de passe.
 
 ---
-# Page d’accueil
+## Page d’accueil
 
 La première page est une page de connexion. L’utilisateur doit :
 
@@ -44,7 +48,7 @@ La première page est une page de connexion. L’utilisateur doit :
 
 ---
 
-# Page Élève
+## Page Élève
 
 Si l’utilisateur est un **élève**, il est redirigé vers une page contenant :
 
@@ -62,7 +66,7 @@ Si l’utilisateur est un **élève**, il est redirigé vers une page contenant 
 
 ---
 
-# Pages Professeur
+## Pages Professeur
 
 Si l’utilisateur est un **professeur**, il est redirigé vers une page qui contient :
 
@@ -99,9 +103,6 @@ Si l’utilisateur est un **professeur**, il est redirigé vers une page qui con
 
 ---
 
-# Page d’Erreur
+## Page d’Erreur
 
 - **Si l’utilisateur modifie l’URL** pour changer son rôle, il est redirigé vers une page d’erreur indiquant qu’il **n’a pas la permission d’accéder à cette page**.
-=======
-# MyNotes
->>>>>>> 9ec47fd55ae419cfcde5c5fbea49c45197a1e9ea
