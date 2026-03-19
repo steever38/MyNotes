@@ -2,7 +2,7 @@
   <img src="https://i.imgur.com/8DOaNe5.png" alt="Description de l'image" width="700">
 </p>
 
-Ce projet est une application web en Python / Flask pour la gestion des notes des élèves et des professeurs.
+Ce projet est une application web en `Python` / `Flask` adossée à une base de données **SQLite** pour la gestion des notes des **élèves** et des **professeurs**.
 Elle inclut des fonctionnalités de sécurité et des pages adaptées aux différents rôles (élève, professeur).
 
 ## Installation
@@ -34,6 +34,12 @@ La première page est une page de connexion. L’utilisateur doit :
 
 ## Sécurité
 
+- **Hachage des mots de passe :**
+  - Les mots de passe sont hachés de manière sécurisée en utilisant l'algorithme SHA-256 via la bibliothèque standard de Python :
+  - ```python
+  hashed_password = hashlib.sha256(password.encode()).hexdigest()
+  ```
+
 - **Limitation du nombre d'appels à l'API de connexion :**
   - **Plus de 10 requêtes par minute** depuis une même adresse IP entraîne un **bannissement temporaire de 1 minute** pour l'accès à l'API de connexion.
 
@@ -45,6 +51,15 @@ La première page est une page de connexion. L’utilisateur doit :
 - **Protection contre les attaques :**
   - **XSS (Cross-Site Scripting) :** Des mesures de validation et d'échappement des données utilisateurs sont mises en place pour éviter l'exécution de scripts malveillants.
   - **SQL Injection :** L'utilisation de requêtes paramétrées et de méthodes de préparation des requêtes empêche l'injection de code SQL malveillant.
+
+---
+
+## Base de données
+Le projet repose sur une base de données relationnelle **SQLite**. Voici le schéma de l'architecture des données :
+<p align="center">
+  <img src="https://i.imgur.com/wiG8vzj.png" alt="Description de l'image" width="500">
+</p>
+
 
 ---
 
